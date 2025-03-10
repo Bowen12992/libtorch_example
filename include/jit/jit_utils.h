@@ -8,7 +8,7 @@
 namespace triton_jit {
 std::string execute_command(std::string_view command);
 
-inline const char *to_triton_typename(c10::ScalarType t) {
+constexpr const char *to_triton_typename(c10::ScalarType t) {
   switch (t) {
     case c10::ScalarType::Float:
       return "fp32";
@@ -30,7 +30,7 @@ inline const char *to_triton_typename(c10::ScalarType t) {
 }
 
 template <typename T>
-inline const char *spec(T v) {
+constexpr const char *spec(T v) {
   return v % 16 == 0 ? ":16" : v == 1 ? ":1" : "";
 }
 
@@ -40,42 +40,29 @@ struct has_data_ptr : std::false_type {};
 template <typename T>
 struct has_data_ptr<
     T,
-    std::enable_if_t<std::conjunction_v<
-        std::is_same<decltype(std::declval<std::remove_reference_t<T>>().data_ptr()), void *>,
-        std::is_same<decltype(std::declval<std::remove_reference_t<T>>().scalar_type()), c10::ScalarType>>>>
+    std::void_t<decltype(std::declval<T>().data_ptr()), decltype(std::declval<T>().scalar_type())>>
     : std::true_type {};
 
 template <typename T>
-struct triton_type_helper {};
+struct triton_type_helper;
 
-template <>
-struct triton_type_helper<bool> {
-  static constexpr const char *name = "i1";
-};
-template <>
-struct triton_type_helper<int> {
-  static constexpr const char *name = "i32";
-};
-template <>
-struct triton_type_helper<int64_t> {
-  static constexpr const char *name = "i64";
-};
+#define DEFINE_TRITON_TYPE(T, Name)           \
+  template <>                                 \
+  struct triton_type_helper<T> {              \
+    static constexpr const char *name = Name; \
+  };
 
-template <>
-struct triton_type_helper<float> {
-  static constexpr const char *name = "f32";
-};
-template <>
-struct triton_type_helper<double> {
-  static constexpr const char *name = "f64";
-};
-template <>
-struct triton_type_helper<std::nullptr_t> {
-  static constexpr const char *name = "*i8";
-};
+DEFINE_TRITON_TYPE(bool, "i1")
+DEFINE_TRITON_TYPE(int, "i32")
+DEFINE_TRITON_TYPE(int64_t, "i64")
+DEFINE_TRITON_TYPE(float, "f32")
+DEFINE_TRITON_TYPE(double, "f64")
+DEFINE_TRITON_TYPE(std::nullptr_t, "*i8")
+
+#undef DEFINE_TRITON_TYPE
 
 template <typename T>
-struct triton_type : triton_type_helper<std::remove_cv_t<std::remove_reference_t<T>>> {};
+using triton_type = triton_type_helper<std::remove_cv_t<std::remove_reference_t<T>>>;
 
 // path of python executable
 const char *get_python_executable();

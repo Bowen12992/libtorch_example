@@ -1,11 +1,9 @@
 cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
 project(flaggems
-  LANGUAGES
-  CUDA CXX
-  VERSION
-  0.0.1)
+        LANGUAGES CUDA CXX
+        VERSION 0.0.1)
 
-# project-wide settings
+# Project-wide settings
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF) # Ensures only standard-compliant C++ is used
@@ -13,14 +11,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # RPATH settings
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
-if(APPLE)
-  set(CMAKE_MACOSX_RPATH ON)
-  set(_rpath_portable_origin "@loader_path")
-else()
-  set(_rpath_portable_origin $ORIGIN)
-endif(APPLE)
+set(_rpath_portable_origin $ORIGIN)
 
-# default Use separate rpaths during build and install phases
+# Default use separate rpaths during build and install phases
 set(CMAKE_SKIP_BUILD_RPATH  FALSE)
 # Don't use the install-rpath during the build phase
 set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
@@ -57,12 +50,6 @@ if(DEFINED SKBUILD)
   # Placing the hello library in the package and using relative RPATHs that
   # doesn't point outside of the package means that the built package is
   # relocatable. This allows for safe binary redistribution.
-  if(APPLE)
-    set_target_properties(
-      c_operators PROPERTIES INSTALL_RPATH "@loader_path/${CMAKE_INSTALL_LIBDIR}")
-  else()
-    set_target_properties(c_operators PROPERTIES INSTALL_RPATH
+  set_target_properties(c_operators PROPERTIES INSTALL_RPATH
                                             "$ORIGIN/${CMAKE_INSTALL_LIBDIR}")
-  endif()
-
 endif()

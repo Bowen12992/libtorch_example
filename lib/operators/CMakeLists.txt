@@ -5,7 +5,7 @@ target_include_directories(operators
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
 target_link_libraries(operators
   PUBLIC ${TORCH_LIBRARIES}
-  PRIVATE triton_jit_function)
+  PRIVATE triton_jit_function )
 
 # add_library(operator_sum SHARED sum.cpp)
 # target_include_directories(operator_sum

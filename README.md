@@ -39,7 +39,7 @@ This directory includes some code to test the operators. The operators should be
 ## how to build
 
 1. activate a python virtual environment where torch is installed
-2. mkdir build & cd build
-3. cmake -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'` ..
+2. mkdir build && cd build
+3. cmake -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'` -DPython_EXECUTABLE=$(which python) ..
 
 ## how to use
